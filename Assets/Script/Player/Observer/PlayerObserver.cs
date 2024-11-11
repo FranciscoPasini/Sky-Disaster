@@ -3,6 +3,10 @@ using UnityEngine;
 public class PlayerObserver : MonoBehaviour
 {
     PlayerManagment playerManagment;
+    [SerializeField] private GameObject speedBoostObject;
+    [SerializeField] private GameObject immunityObject;
+    [SerializeField] private GameObject extraLifeObject;
+
     private void Awake()
     {
         playerManagment = GetComponent<PlayerManagment>();
@@ -24,7 +28,6 @@ public class PlayerObserver : MonoBehaviour
 
         PlayerActions.OnWin -= OnWin;
         PlayerActions.OnRescue -= AllieRescue;
-
     }
 
     private void OnLose()
@@ -34,16 +37,31 @@ public class PlayerObserver : MonoBehaviour
 
         Destroy(gameObject);
     }
-    
+
     private void OnWin()
     {
         GameManager.instance.Win();
         StopAllCoroutines();
-    } 
-    
+    }
+
     private void AllieRescue()
     {
         playerManagment.AllieSaved();
     }
-}
 
+    // Método para resetear los power-ups cuando el jugador pase por el observador
+    public void ResetPowerUps()
+    {
+        if (speedBoostObject != null) speedBoostObject.SetActive(true);
+        if (immunityObject != null) immunityObject.SetActive(true);
+        if (extraLifeObject != null) extraLifeObject.SetActive(true);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            ResetPowerUps(); // Llama al método para resetear los power-ups
+        }
+    }
+}

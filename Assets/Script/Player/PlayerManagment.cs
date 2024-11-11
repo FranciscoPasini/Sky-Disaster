@@ -7,21 +7,29 @@ public class PlayerManagment : MonoBehaviour
     public bool CanDie { get => canDie; set => canDie = value; }
 
     [SerializeField] private Vector2 spawnPosition;
+    [SerializeField] private float speedBoostMultiplier = 2f;
 
     private int alliesRescues;
     private int levelcompleted = 0;
-    private float currentPosition;
     private bool canDie;
     private Animator animator;
+    private Movement movement; // Referencia al script de movimiento
     private PlayerActions playerActions;
     private PlayerHealth playerHealth;
+
+    // Flags de uso de power-ups
+    public bool SpeedBoostUsed { get; set; }
+    public bool ImmunityUsed { get; set; }
+    public bool ExtraLifeUsed { get; set; }
 
     private void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
+        movement = gameObject.GetComponent<Movement>();
         playerActions = gameObject.GetComponent<PlayerActions>();
         playerHealth = gameObject.GetComponent<PlayerHealth>();
     }
+
     void Start()
     {
         alliesRescues = 0;
@@ -38,6 +46,23 @@ public class PlayerManagment : MonoBehaviour
         levelcompleted++;
     }
 
+    // Power-up de velocidad por 3 segundos
+    public void ActivateSpeedBoost()
+    {
+        if (!SpeedBoostUsed)
+        {
+            StartCoroutine(SpeedBoost());
+            SpeedBoostUsed = true;
+        }
+    }
+
+    private IEnumerator SpeedBoost()
+    {
+        float originalSpeed = movement.Speed; // Guarda la velocidad original
+        movement.Speed *= speedBoostMultiplier; // Aumenta la velocidad
+        yield return new WaitForSeconds(3); // Dura 3 segundos
+        movement.Speed = originalSpeed; // Restaura la velocidad original
+    }
 
     // Espera 2 segundos luego puede morir y ya no estara muerto(Tiempo de Respawn)
     public void RespawnTime()
