@@ -1,21 +1,25 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
     private int nextSceneLoad;
+
     private void Start()
     {
-        nextSceneLoad = SceneManager.GetActiveScene().buildIndex + 1;
+        // Lee el nivel alcanzado o establece 1 si no hay datos guardados.
+        nextSceneLoad = PlayerPrefs.GetInt("levelAt", 1);
     }
 
     public void levelSelectorMenu()
     {
         SceneManager.LoadScene(1);
-        if (nextSceneLoad > PlayerPrefs.GetInt("levelAt"))
+
+        // Guarda el progreso si el nivel alcanzado es mayor al guardado.
+        if (nextSceneLoad > PlayerPrefs.GetInt("levelAt", 1))
         {
             PlayerPrefs.SetInt("levelAt", nextSceneLoad);
+            PlayerPrefs.Save();
         }
     }
 
@@ -23,21 +27,24 @@ public class ScenesManager : MonoBehaviour
     {
         SceneManager.LoadScene(nextSceneLoad);
 
-        if (nextSceneLoad > PlayerPrefs.GetInt("levelAt"))
+        // Actualiza y guarda el progreso si es necesario.
+        if (nextSceneLoad > PlayerPrefs.GetInt("levelAt", 1))
         {
             PlayerPrefs.SetInt("levelAt", nextSceneLoad);
+            PlayerPrefs.Save();
         }
     }
 
     public void QuitGame()
     {
-        PlayerPrefs.DeleteAll();
+        // Asegura que los datos persistentes se guarden antes de salir.
+        PlayerPrefs.Save();
         Application.Quit();
     }
 
     public void RestartGame()
     {
-        GameManager.instance.Restart();
+        // Reinicia la escena actual.
         int actualScene = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(actualScene);
     }
@@ -45,15 +52,11 @@ public class ScenesManager : MonoBehaviour
     public void NextScene()
     {
         int currentIndex = SceneManager.GetActiveScene().buildIndex;
-        currentIndex++;
+        int totalScenes = SceneManager.sceneCountInBuildSettings;
 
-        if (currentIndex > 3)
-        {
-            currentIndex = 0;
-            SceneManager.LoadScene(currentIndex);
-        }
-        else
-            SceneManager.LoadScene(currentIndex);
+        // Pasa a la siguiente escena o reinicia si es la última.
+        currentIndex = (currentIndex + 1) % totalScenes;
+        SceneManager.LoadScene(currentIndex);
     }
 
     public void GoMenu()
