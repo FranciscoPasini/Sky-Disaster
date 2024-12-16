@@ -17,11 +17,6 @@ public class PlayerManagment : MonoBehaviour
     private PlayerActions playerActions;
     private PlayerHealth playerHealth;
 
-    // Flags de uso de power-ups
-    public bool SpeedBoostUsed { get; set; }
-    public bool ImmunityUsed { get; set; }
-    public bool ExtraLifeUsed { get; set; }
-
     private void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
@@ -44,24 +39,6 @@ public class PlayerManagment : MonoBehaviour
     public void LevelCompleted()
     {
         levelcompleted++;
-    }
-
-    // Power-up de velocidad por 3 segundos
-    public void ActivateSpeedBoost()
-    {
-        if (!SpeedBoostUsed)
-        {
-            StartCoroutine(SpeedBoost());
-            SpeedBoostUsed = true;
-        }
-    }
-
-    private IEnumerator SpeedBoost()
-    {
-        float originalSpeed = movement.Speed; // Guarda la velocidad original
-        movement.Speed *= speedBoostMultiplier; // Aumenta la velocidad
-        yield return new WaitForSeconds(3); // Dura 3 segundos
-        movement.Speed = originalSpeed; // Restaura la velocidad original
     }
 
     // Espera 2 segundos luego puede morir y ya no estara muerto(Tiempo de Respawn)

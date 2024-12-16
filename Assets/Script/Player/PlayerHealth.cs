@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
+    public bool CanReceiveDamage { get; set; } = true;
     public static event Action OnDead;
     public static event Action OnGetDamage;
-
     [SerializeField] private int health;
-    [SerializeField] private int maxHealth = 3;
-    private bool isInvincible = false;
-    private PlayerManagment playerManagment;
+    PlayerManagment playerManagment;
+    private bool isImmune = false;
+    private int maxLife = 3;
 
     public int Health { get => health; private set => health = value; }
-
     private void Awake()
     {
         playerManagment = GetComponent<PlayerManagment>();
@@ -21,39 +20,38 @@ public class PlayerHealth : MonoBehaviour
 
     public void GetDamage()
     {
-        // Daño solo si no es invencible
-        if (playerManagment.CanDie && !isInvincible)
+        if (playerManagment.CanDie && !isImmune)
         {
+            health--;
             OnGetDamage?.Invoke();
-            health -= 1;
+            Debug.Log("Damage received. Health remaining: " + health);
+        }
+        else if (isImmune)
+        {
+            Debug.Log("Player is immune, no damage caused.");
         }
     }
 
-    // Activa la inmunidad por un tiempo determinado
     public void ActivateImmunity(float duration)
     {
-        if (!playerManagment.ImmunityUsed)
-        {
-            StartCoroutine(Immunity(duration));
-            playerManagment.ImmunityUsed = true;
-        }
+        StartCoroutine(ImmunityRoutine(duration));
     }
 
-    private IEnumerator Immunity(float duration)
+    private IEnumerator ImmunityRoutine(float duration)
     {
-        isInvincible = true;
+        isImmune = true;
         yield return new WaitForSeconds(duration);
-        isInvincible = false;
+        isImmune = false;
     }
 
-    // Da una vida extra si no se ha usado el power-up y si la salud es menor al máximo
-    public void ExtraLife()
+    public void AddLife(int extraLife = 1)
     {
-        if (!playerManagment.ExtraLifeUsed && health < maxHealth)
+        if (Health >= maxLife)
         {
-            health += 1;
-            playerManagment.ExtraLifeUsed = true;
+            return;
         }
+        Health += extraLife;
+        Debug.Log($"Life added. Current health: {Health}");
     }
 
     private void Update()

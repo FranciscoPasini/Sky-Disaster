@@ -20,27 +20,6 @@ public class PlayerActions : MonoBehaviour
         playerHealth = gameObject.GetComponent<PlayerHealth>();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Q) && speedBoostObject.activeSelf)
-        {
-            playerManagment.ActivateSpeedBoost();
-            speedBoostObject.SetActive(false); // Desactiva el objeto de velocidad
-        }
-
-        if (Input.GetKeyDown(KeyCode.E) && immunityObject.activeSelf)
-        {
-            playerHealth.ActivateImmunity(3f); // Inmunidad por 3 segundos
-            immunityObject.SetActive(false); // Desactiva el objeto de inmunidad
-        }
-
-        if (Input.GetKeyDown(KeyCode.R) && extraLifeObject.activeSelf)
-        {
-            playerHealth.ExtraLife();
-            extraLifeObject.SetActive(false); // Desactiva el objeto de vida extra
-        }
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         IInteractuable interactuable = collision.GetComponent<IInteractuable>();

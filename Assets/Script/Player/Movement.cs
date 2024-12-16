@@ -1,11 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
-    public float Speed { get => speed; set => speed = value; } // Agregamos propiedad para la velocidad
     private float timeToRevert = 3f;
     private Rigidbody2D playerRB;
     private Vector2 moveInput;
@@ -13,18 +11,20 @@ public class Movement : MonoBehaviour
     private float direction = 1f;
     private bool inverted = false;
     private float currentTime = 0f;
+    private float currentSpeed;
 
     void Start()
     {
         animator = gameObject.GetComponent<Animator>();
         playerRB = GetComponent<Rigidbody2D>();
+        currentSpeed = speed;
     }
 
-    // Update is called once per frame
     void Update()
     {
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
+
         moveInput = new Vector2(moveX, moveY).normalized;
 
         if (moveX == 1)
@@ -51,7 +51,7 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        playerRB.MovePosition(playerRB.position + moveInput * speed * Time.fixedDeltaTime);
+        playerRB.MovePosition(playerRB.position + moveInput * currentSpeed * Time.fixedDeltaTime);
     }
 
     public void InvertDirection()
@@ -68,5 +68,17 @@ public class Movement : MonoBehaviour
     {
         direction *= -1;
         inverted = false;
+    }
+
+    public void BoostSpeed(float multiplier, float duration)
+    {
+        StartCoroutine(SpeedBoostCoroutine(multiplier, duration));
+    }
+
+    private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
+    {
+        currentSpeed = speed * multiplier;
+        yield return new WaitForSeconds(duration);
+        currentSpeed = speed;
     }
 }
